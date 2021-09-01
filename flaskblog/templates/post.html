@@ -1,0 +1,54 @@
+{% extends "layout.html" %}
+{% block content %}
+  <article class="media content-section">
+    <img class="rounded-circle article-img" src="{{ url_for('static', filename='profile_pics/' + post.author.image_file) }}">
+    <div class="media-body">
+      <div class="article-metadata">
+        <a class="mr-2" href="#">{{ post.author.username }}</a>
+        <small class="text-muted">{{ post.date_posted.strftime('%Y-%m-%d') }}</small>
+        {% if post.author == current_user %}
+          <div>
+            <a class="btn btn-secondary btn-sm mt-1 mb-1" href="{{ url_for('update_post', post_id=post.id) }}">Update</a>
+            <button type="button" class="btn btn-danger btn-sm m-1" data-toggle="modal" data-target="#deleteModal">Delete</button>
+          </div>
+        {% endif %}
+        <br> <a class="btn btn-secondary btn-sm mt-1 mb-1" href="{{ url_for('cast_votes', post_id=post.id) }}">Vote</a>
+
+      </div>
+      <h2 class="article-title">{{ post.title }}</h2>
+      <h4 class="article-content"> a) {{ post.c1 }}</h4>
+      <p class="article-content">{{ post.v1 }}</p>
+      <h4 class="article-content"> b) {{ post.c2 }}</h4>
+      <p class="article-content">{{ post.v2 }}</p>
+      <h4 class="article-content"> c){{ post.c3 }}</h4>
+      <p class="article-content">{{ post.v3 }}</p>
+      <h4 class="article-content"> d) {{ post.c4 }}</h4>
+      <p class="article-content">{{ post.v4 }}</p>
+      <h4 class="article-content"> e) {{ post.c5 }}</h4>
+      <p class="article-content">{{ post.v5 }}</p>
+    </div>
+  </article>
+  <!-- Modal -->
+  <div class="modal fade" id="deleteModal" tabindex="-1" role="dialog" aria-labelledby="deleteModalLabel" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="deleteModalLabel">Delete Post?</h5>
+          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+          </button>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+          <form action="{{ url_for('delete_post', post_id=post.id) }}" method="POST">
+            <input class="btn btn-danger" type="submit" value="Delete">
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  {%block voting%}
+  {%endblock voting%}
+
+{% endblock content %}
