@@ -27,7 +27,7 @@ def register():
     form = RegistrationForm()
     if form.validate_on_submit():
         hashed_password = bcrypt.generate_password_hash(form.password.data).decode('utf-8')
-        user = User(username=form.username.data, email=form.email.data, password=hashed_password)
+        user = User(voter_id=form.voter_id.data, email=form.email.data, password=hashed_password, dob=form.dob.data)
         db.session.add(user)
         db.session.commit()
         flash('Your account has been created! You are now able to log in', 'success')
@@ -41,8 +41,8 @@ def login():
         return redirect(url_for('home'))
     form = LoginForm()
     if form.validate_on_submit():
-        user = User.query.filter_by(email=form.email.data).first()
-        if user and bcrypt.check_password_hash(user.password, form.password.data):
+        user = User.query.filter_by(voter_id=form.voter_id.data).first()
+        if user and bcrypt.check_password_hash(user.password, form.password.data) and user.dob==form.dob.data:
             login_user(user, remember=form.remember.data)
             next_page = request.args.get('next')
             return redirect(next_page) if next_page else redirect(url_for('home'))
@@ -138,6 +138,7 @@ def cast_votes(post_id):
     post = Post.query.get_or_404(post_id)
     form=Vote_Form()
     if form.validate_on_submit():
+        current_user.voted_upto=post.id
         flash("Your vote has been recorded", "success")
         if(form.v.data == "1"):
             post.v1=post.v1+1
@@ -150,9 +151,17 @@ def cast_votes(post_id):
         elif(form.v.data == "5"):
             post.v5=post.v5+1
         db.session.commit()
-        return redirect(url_for('post', post_id = post.id))
+        return redirect(url_for('home'))
+    else:
+        if(post.id==current_user.voted_upto+1):
+            return render_template('vote.html', post=post, form=form, post_id=post.id)
+        elif(post.id<current_user.voted_upto+1):
+            flash("You have already voted for this election", "danger")
+            return redirect(url_for('home'))
+        else:
+            flash("Kindly vote for previous Elections First!", "danger")
+            return redirect(url_for('home'))
 
-    return render_template('vote.html', post=post, form=form, post_id=post.id)
 
 @app.route("/post/<int:post_id>/delete", methods=['POST'])
 @login_required
