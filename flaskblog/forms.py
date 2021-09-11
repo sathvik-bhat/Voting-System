@@ -39,18 +39,18 @@ class LoginForm(FlaskForm):
 
 
 class UpdateAccountForm(FlaskForm):
-    username = StringField('Username',
+    voter_id = StringField('Voters ID',
                            validators=[DataRequired(), Length(min=2, max=20)])
     email = StringField('Email',
                         validators=[DataRequired(), Email()])
     picture = FileField('Update Profile Picture', validators=[FileAllowed(['jpg', 'png'])])
     submit = SubmitField('Update')
 
-    def validate_username(self, username):
-        if username.data != current_user.username:
-            user = User.query.filter_by(username=username.data).first()
+    def validate_voter_id(self, voter_id):
+        if voter_id.data != current_user.voter_id:
+            user = User.query.filter_by(voter_id=voter_id.data).first()
             if user:
-                raise ValidationError('That username is taken. Please choose a different one.')
+                raise ValidationError('That Voter ID is taken. Please choose a different one.')
 
     def validate_email(self, email):
         if email.data != current_user.email:
